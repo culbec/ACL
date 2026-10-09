@@ -1,0 +1,326 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.semanticweb.org/dana/ontologies/2020/7/untitled-ontology-38"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://www.semanticweb.org/dana/ontologies/2020/7/untitled-ontology-38">
+    <Prefix name="" IRI="http://www.semanticweb.org/dana/ontologies/2020/7/untitled-ontology-38"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Declaration>
+        <Class IRI="#HouseColor"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Man"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Pet"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#lives_in"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#owns"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#American"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Englishman"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Japaneze"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#blue"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#dog"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#green"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#horse"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#red"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#snake"/>
+    </Declaration>
+    <EquivalentClasses>
+        <Class IRI="#HouseColor"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="#blue"/>
+            <NamedIndividual IRI="#green"/>
+            <NamedIndividual IRI="#red"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Man"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="#American"/>
+            <NamedIndividual IRI="#Englishman"/>
+            <NamedIndividual IRI="#Japaneze"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Pet"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="#dog"/>
+            <NamedIndividual IRI="#horse"/>
+            <NamedIndividual IRI="#snake"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <SubClassOf>
+        <Class IRI="#HouseColor"/>
+        <ObjectSomeValuesFrom>
+            <ObjectInverseOf>
+                <ObjectProperty IRI="#lives_in"/>
+            </ObjectInverseOf>
+            <Class IRI="#Man"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Man"/>
+        <ObjectIntersectionOf>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="#lives_in"/>
+                <Class IRI="#HouseColor"/>
+            </ObjectSomeValuesFrom>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="#owns"/>
+                <Class IRI="#Pet"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Pet"/>
+        <ObjectSomeValuesFrom>
+            <ObjectInverseOf>
+                <ObjectProperty IRI="#owns"/>
+            </ObjectInverseOf>
+            <Class IRI="#Man"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <ClassAssertion>
+        <ObjectHasValue>
+            <ObjectProperty IRI="#owns"/>
+            <NamedIndividual IRI="#dog"/>
+        </ObjectHasValue>
+        <NamedIndividual IRI="#American"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <ObjectHasValue>
+            <ObjectProperty IRI="#lives_in"/>
+            <NamedIndividual IRI="#red"/>
+        </ObjectHasValue>
+        <NamedIndividual IRI="#Englishman"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <ObjectSomeValuesFrom>
+            <ObjectInverseOf>
+                <ObjectProperty IRI="#owns"/>
+            </ObjectInverseOf>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#lives_in"/>
+                <NamedIndividual IRI="#green"/>
+            </ObjectHasValue>
+        </ObjectSomeValuesFrom>
+        <NamedIndividual IRI="#snake"/>
+    </ClassAssertion>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#Englishman"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#Englishman"/>
+        <NamedIndividual IRI="#Japaneze"/>
+        <NamedIndividual IRI="#blue"/>
+        <NamedIndividual IRI="#dog"/>
+        <NamedIndividual IRI="#green"/>
+        <NamedIndividual IRI="#horse"/>
+        <NamedIndividual IRI="#red"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#Japaneze"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#blue"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#dog"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#green"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#horse"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#red"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#American"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Englishman"/>
+        <NamedIndividual IRI="#Japaneze"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Englishman"/>
+        <NamedIndividual IRI="#blue"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Englishman"/>
+        <NamedIndividual IRI="#dog"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Englishman"/>
+        <NamedIndividual IRI="#green"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Englishman"/>
+        <NamedIndividual IRI="#horse"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Englishman"/>
+        <NamedIndividual IRI="#red"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Englishman"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Japaneze"/>
+        <NamedIndividual IRI="#blue"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Japaneze"/>
+        <NamedIndividual IRI="#dog"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Japaneze"/>
+        <NamedIndividual IRI="#green"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Japaneze"/>
+        <NamedIndividual IRI="#horse"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Japaneze"/>
+        <NamedIndividual IRI="#red"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Japaneze"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#blue"/>
+        <NamedIndividual IRI="#dog"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#blue"/>
+        <NamedIndividual IRI="#green"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#blue"/>
+        <NamedIndividual IRI="#horse"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#blue"/>
+        <NamedIndividual IRI="#red"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#blue"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#dog"/>
+        <NamedIndividual IRI="#green"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#dog"/>
+        <NamedIndividual IRI="#horse"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#dog"/>
+        <NamedIndividual IRI="#red"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#dog"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#green"/>
+        <NamedIndividual IRI="#horse"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#green"/>
+        <NamedIndividual IRI="#red"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#green"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#horse"/>
+        <NamedIndividual IRI="#red"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#horse"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#red"/>
+        <NamedIndividual IRI="#snake"/>
+    </DifferentIndividuals>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#lives_in"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#owns"/>
+    </FunctionalObjectProperty>
+    <InverseFunctionalObjectProperty>
+        <ObjectProperty IRI="#lives_in"/>
+    </InverseFunctionalObjectProperty>
+    <InverseFunctionalObjectProperty>
+        <ObjectProperty IRI="#owns"/>
+    </InverseFunctionalObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#lives_in"/>
+        <Class IRI="#Man"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#owns"/>
+        <Class IRI="#Man"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#lives_in"/>
+        <Class IRI="#HouseColor"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#owns"/>
+        <Class IRI="#Pet"/>
+    </ObjectPropertyRange>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
