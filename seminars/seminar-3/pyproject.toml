@@ -1,0 +1,18 @@
+[project]
+name = "seminar-3"
+version = "0.1.0"
+description = "ACL Seminar 3: Experiment with a corpus"
+readme = "README.md"
+requires-python = ">=3.14.10"
+dependencies = [
+    "en-core-web-sm",
+    "es-core-news-sm",
+    "ipykernel>=7.4.0",
+    "numpy>=2.5.4",
+    "seaborn>=0.13.2",
+    "spacy>=3.8.18",
+]
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }
+es-core-news-sm = { url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl" }
