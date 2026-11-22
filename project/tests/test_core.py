@@ -38,3 +38,55 @@ def test_ontology(tmp_path):
     assert ontology.information_content("Person", path) == 0
     assert ontology.information_content("Age", path) == 1
     assert 0 < ontology.information_content("Employment", path) < ontology.information_content("Finance", path) < 1
+
+
+def test_ensemble():
+    import numpy as np
+    from project_acl import ensemble
+
+    df = preprocess.read()
+    X, y, _ = preprocess.encode(df)
+    X_tr, X_te, y_tr, _ = preprocess.split(X, y, df)
+    X_te = X_te.to_numpy(float)[:500]
+    models = ensemble.build(X_tr, y_tr, n_members=5)
+
+    for name, model in models.items():
+        phi = ensemble.member_contributions(model, X_te, dtype=float)
+        p = ensemble.member_proba(model, X_te)
+        assert phi.shape == (5, *X_te.shape) and p.shape == (5, len(X_te))
+        for k, (m, f) in enumerate(ensemble.members(model)):
+            if name == "RF":  # Saabas in log-odds: contributions sum to logit(leaf) - logit(root)
+                logits = ensemble.node_logit(m)
+                expected = logits[m.apply(X_te)] - logits[0]
+            else:  # LR: contributions sum to logit(x) - logit(member's training mean)
+                expected = m.decision_function(X_te[:, f]) - m.decision_function(m[0].mean_[None])[0]
+                assert (phi[k][:, np.setdiff1d(np.arange(X_te.shape[1]), f)] == 0).all()
+            np.testing.assert_allclose(phi[k].sum(axis=1), expected, atol=1e-6)
+
+
+def test_concepts():
+    import numpy as np
+    from scipy.stats import kendalltau
+    from project_acl import concepts
+
+    rng = np.random.default_rng(0)
+    phi = rng.normal(size=(6, 40, 5))
+    phi[:, :, 4] = 0  # a column never used: ties in every ranking
+    labels = np.array(["A", "B", "B", None, "C"], object)
+    v, names = concepts.concept_vectors(phi, labels)
+    assert names == ["A", "B", "C"]
+    np.testing.assert_allclose(v.sum(axis=2), 1)
+    np.testing.assert_allclose(v[..., 1] * np.abs(phi[..., :3]).sum(2), np.abs(phi[..., 1:3]).sum(2))
+
+    # vectorised tau-b == mean of scipy's tau-b over member pairs
+    v = np.round(rng.random((6, 30, 6)), 1)  # rounding creates ties
+    expected = [np.mean([kendalltau(v[a, s], v[b, s]).statistic for a in range(6) for b in range(a + 1, 6)])
+                for s in range(30)]
+    np.testing.assert_allclose(concepts.mean_kendall(v, chunk=7), expected)
+
+    proba = np.array([[0.9, 0.9], [0.8, 0.1], [0.2, 0.7]])
+    np.testing.assert_allclose(concepts.vote_margin(proba), [1 / 3, 1 / 3])
+    v = rng.random((3, 2, 4))
+    diff = concepts.camp_difference(v, proba)
+    np.testing.assert_allclose(diff[0], (v[0, 0] + v[1, 0]) / 2 - v[2, 0])
+    assert np.isnan(concepts.camp_difference(v, np.full((3, 2), 0.9))).all()

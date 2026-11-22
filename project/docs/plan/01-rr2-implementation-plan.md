@@ -56,8 +56,9 @@ ProtectedAttribute (separate view)   race, sex, relationship  (relationship leak
 
 For a sample `x` and member `m`, we compute a contribution `phi_m(x, f)` for each feature `f`:
 
-- **Tree member:** path decomposition (Saabas). Walk the decision path; at each split, the change in the class-1 probability is credited to the split feature. Contributions sum to `p_m(x) - p_m(root)`.
-- **LR member:** `coef_f * (x_f - mean_f)` on the member's feature subset, in log-odds space.
+- **Tree member:** path decomposition (Saabas) in log-odds space. Walk the decision path; at each split, the change in the class-1 log-odds is credited to the split feature. Node probabilities are Laplace-smoothed (`(p n + 1) / (n + 2)`) so pure nodes stay finite. Contributions sum to `logit_m(leaf) - logit_m(root)`.
+- **LR member:** `coef_f * (x_f - mean_f)` on the member's feature subset, in log-odds space. Each member standardises its own bootstrap sample (scaler inside the member).
+- Both member types are in log-odds, so contributions share one scale across ensembles.
 
 Concept vector: `c_m(x, k) = sum over f in concept k of |phi_m(x, f)|`, normalised to sum to 1. It is computed at each ontology level (leaf concepts, top-level concepts).
 
@@ -143,10 +144,10 @@ Each phase is one agent task. **Gate** = supervisor review before the next depen
 - **Done when:** the OWL file reloads, and every non-excluded feature maps to exactly one concept per level (the `ProtectedAttribute` second parent is handled as a separate view).
 
 ### P4 - Ensembles + contributions (`ensemble.py`, `03_ensembles.ipynb`)
-- RF: `max_depth` 3-5, about 100 trees. Bagging-LR: about 100 members, `max_features` about 0.5 so the members differ.
+- RF: 100 trees, `max_depth=5`, `max_features=0.3` per split (stronger members than depth 4 + `sqrt`; member F1 matches LR members). Bagging-LR: 100 members, `max_features=0.5` so the members differ.
 - `member_contributions(model, X) -> array (members, samples, features)` for both member types.
 - Notebook: accuracy / F1 of the ensembles and of single members; member diversity (pairwise prediction disagreement).
-- **Done when:** the test checks that tree contributions sum to `p_m(x) - p_m(root)` for each member.
+- **Done when:** the test checks that tree contributions sum to `logit_m(leaf) - logit_m(root)` and LR contributions to `logit_m(x) - logit_m(mean)` for each member.
 
 ### P5 - Concept agreement (`concepts.py`, `04_concept_agreement.ipynb`)
 - Concept vectors per level; the agreement metrics from 3.3.
