@@ -41,7 +41,7 @@ def download(
     with Progress(
         TextColumn("{task.description}"), BarColumn(), DownloadColumn(), TransferSpeedColumn()
     ) as progress:
-        for name in [NAMES_FILE, *SPLITS.values()]:
+        for name in [NAMES_FILE, *SPLITS.values()]:  # adult.names gives the column names
             path = raw_dir / name
             if path.exists() and not force:
                 log.info("skip %s (present)", name)
@@ -59,6 +59,7 @@ def download(
 
 
 def _fetch(url: str, path: Path, timeout: float, progress: Progress) -> None:
+    """Stream one file to `<path>.part`, then rename it, so `path` exists only when complete."""
     part = path.with_name(path.name + ".part")
     task = progress.add_task(path.name, total=None)
     try:
@@ -100,7 +101,7 @@ def load(raw_dir: Path = RAW_DIR, target: str = TARGET, positive: str = POSITIVE
         df["split"] = split
         parts.append(df)
     df = pd.concat(parts, ignore_index=True)
-    df[target] = (df[target].str.rstrip(".") == positive).astype(int)
+    df[target] = (df[target].str.rstrip(".") == positive).astype(int)  # test labels end in '.', e.g. '>50K.'
     log.info("loaded %d rows (%s)", len(df), df["split"].value_counts().to_dict())
     return df
 

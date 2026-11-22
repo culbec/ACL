@@ -62,9 +62,9 @@ def node_logit(tree) -> np.ndarray:
     `n` is the bootstrap-weighted sample count; `tree_.value` is normalised or counts depending on sklearn version.
     """
     t = tree.tree_
-    v = t.value[:, 0, :]
+    v = t.value[:, 0, :]  # (nodes, classes)
     n = t.weighted_n_node_samples
-    p = (v[:, 1] / v.sum(axis=1) * n + 1) / (n + 2)
+    p = (v[:, 1] / v.sum(axis=1) * n + 1) / (n + 2)  # dividing by the row sum works for both value formats
     return np.log(p / (1 - p))
 
 
@@ -76,14 +76,17 @@ def tree_contributions(tree, X) -> np.ndarray:
     """
     t = tree.tree_
     p = node_logit(tree)
+    # parent[node] = index of its parent; -1 for the root. sklearn stores children, so invert that map.
     parent = np.full(t.node_count, -1)
     for kids in (t.children_left, t.children_right):
-        is_split = kids >= 0
+        is_split = kids >= 0  # leaves have child index -1
         parent[kids[is_split]] = np.flatnonzero(is_split)
     child = np.flatnonzero(parent >= 0)
+    # credit[node, feature]: change in log-odds when entering `node`, booked on the feature its parent splits on
     credit = sparse.csr_matrix(
         (p[child] - p[parent[child]], (child, t.feature[parent[child]])), shape=(t.node_count, t.n_features)
     )
+    # decision_path is a (samples, nodes) 0/1 matrix, so the product sums the credits along each sample's path
     return np.asarray((tree.decision_path(X) @ credit).todense())
 
 
@@ -93,6 +96,7 @@ def lr_contributions(pipe, X) -> np.ndarray:
     `mean_f` is the member's own training mean, so rows sum to `logit(x) - logit(mean)`.
     """
     scaler, lr = pipe[0], pipe[-1]
+    # after scaling, x_f - mean_f is the standardised value itself, so coef * scaled input is the contribution
     return scaler.transform(X) * lr.coef_[0]
 
 
@@ -106,5 +110,6 @@ def member_contributions(model, X, dtype=np.float32) -> np.ndarray:
     X = np.asarray(X, dtype=float)
     phi = np.zeros((len(model.estimators_), len(X), X.shape[1]), dtype=dtype)
     for k, (m, f) in enumerate(members(model)):
+        # LR members see only their feature subset `f`; trees see every column (f covers all of them)
         phi[k][:, f] = lr_contributions(m, X[:, f]) if isinstance(model, BaggingClassifier) else tree_contributions(m, X)
     return phi

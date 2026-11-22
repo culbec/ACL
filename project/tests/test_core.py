@@ -1,7 +1,10 @@
+"""Checks for the non-trivial logic: data loading, ontology lookup, contribution sums, concept metrics."""
+
 from project_acl import data, ontology, preprocess
 
 
 def test_data():
+    """Official row counts, no `?` left, binary target, every encoded column traced to a source feature."""
     data.download()
     df = data.load()
     assert len(data.columns()) == 15
@@ -22,6 +25,7 @@ def test_data():
 
 
 def test_ontology(tmp_path):
+    """The OWL file reloads and every model feature maps to exactly one concept per level."""
     path = ontology.build(tmp_path / "adult.owl")
     onto = ontology.load(path)  # reloads from disk
     assert onto.Person and onto.mapsToFeature
@@ -41,6 +45,7 @@ def test_ontology(tmp_path):
 
 
 def test_ensemble():
+    """Per-member contributions add up exactly to the member's log-odds change."""
     import numpy as np
     from project_acl import ensemble
 
@@ -65,6 +70,7 @@ def test_ensemble():
 
 
 def test_concepts():
+    """Concept vectors, vectorised Kendall tau-b, vote margin and camp difference against direct computations."""
     import numpy as np
     from scipy.stats import kendalltau
     from project_acl import concepts

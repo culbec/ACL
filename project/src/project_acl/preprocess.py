@@ -1,4 +1,4 @@
-"""Preprocessing between raw data and the EDA notebook: clean, save, encode, split.
+"""Preprocessing between the raw data and the notebooks: clean, save, encode, split.
 
 Run `uv run project-acl-preprocess --help` for the CLI.
 """
@@ -15,8 +15,8 @@ from project_acl.log import get_logger
 log = get_logger(__name__)
 
 PROCESSED = DATA_DIR / "processed" / "adult.csv"
-# Not model inputs (EDA section 3-5): census sampling weight, no association with any feature or the target.
-# Kept in the processed CSV so the EDA can still show it.
+# Not model inputs: fnlwgt is a census sampling weight with no association with any feature or the target
+# (`01_data_eda.ipynb`, sections 3-5). It stays in the processed CSV so the EDA can still show it.
 EXCLUDED = ["fnlwgt"]
 
 
@@ -36,7 +36,7 @@ def save(df: pd.DataFrame, path: Path = PROCESSED) -> None:
 
 
 def read(path: Path = PROCESSED) -> pd.DataFrame:
-    """Processed frame, as read by the EDA notebook and later phases."""
+    """Processed frame, as read by every notebook."""
     return pd.read_csv(path)
 
 
@@ -45,15 +45,16 @@ def encode(
 ) -> tuple[pd.DataFrame, pd.Series, dict[str, str]]:
     """Drop `exclude`, one-hot categoricals (`col=value`). Missing values -> all-zero dummies.
 
-    Per the EDA: rows with missing values stay (not missing at random; no imputation), and both `education`
-    and `education-num` stay (same variable, but they share one ontology concept so attribution is summed).
+    Rows with missing values stay: the EDA shows they are not missing at random, and an all-zero one-hot group
+    encodes "unknown" without imputing a value. Both `education` and `education-num` stay: they are the same
+    variable, but they share one ontology concept, so their attribution is summed into that concept.
 
     Returns X, y and a map encoded column -> source feature.
     """
     feats = df.drop(columns=[target, "split", *exclude])
     cats = feats.select_dtypes(exclude="number").columns.tolist()
     X = pd.get_dummies(feats, columns=cats, prefix_sep="=", dtype=int)
-    source = {c: c.split("=")[0] for c in X.columns}
+    source = {c: c.split("=")[0] for c in X.columns}  # numeric columns have no `=` and map to themselves
     return X, df[target], source
 
 

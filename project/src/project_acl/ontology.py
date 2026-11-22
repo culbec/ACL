@@ -1,6 +1,7 @@
-"""Adult ontology (approved in `01_data_eda.ipynb` section 7): build/save/load OWL, feature -> concept lookup, IC.
+"""Adult ontology: build, save and load the OWL file, feature -> concept lookup, information content (IC).
 
-`HIERARCHY` is the single source of truth for building; lookups read the saved OWL file.
+The hierarchy is derived from the feature associations in `01_data_eda.ipynb`. `HIERARCHY` is used only to build
+the OWL file; every lookup reads the saved file, so the analysis depends on the ontology and not on this dict.
 """
 
 import math
@@ -20,7 +21,7 @@ IRI = "http://project-acl.local/adult.owl#"
 ROOT = "Person"
 PROTECTED = "ProtectedAttribute"
 
-# top concept -> leaf concept -> source features
+# top concept (level 1) -> leaf concept (level 2) -> source features of the dataset
 HIERARCHY = {
     "Demographics": {"Age": ["age"], "Origin": ["race", "native-country"], "Sex": ["sex"]},
     "Family": {"MaritalStatus": ["marital-status"], "HouseholdRole": ["relationship"]},
@@ -28,7 +29,8 @@ HIERARCHY = {
     "Employment": {"Sector": ["workclass"], "Occupation": ["occupation"], "WorkTime": ["hours-per-week"]},
     "Finance": {"Capital": ["capital-gain", "capital-loss"]},
 }
-PROTECTED_FEATURES = ["race", "sex", "relationship"]  # relationship leaks sex (Husband/Wife)
+# Separate view over existing features: relationship is included because Husband/Wife reveal sex
+PROTECTED_FEATURES = ["race", "sex", "relationship"]
 
 
 def build(path: Path = OWL_PATH) -> Path:
@@ -38,12 +40,13 @@ def build(path: Path = OWL_PATH) -> Path:
         class mapsToFeature(AnnotationProperty):  # noqa: N801 - OWL property name
             pass
 
+        # types.new_class creates OWL classes from names held in variables (owlready2 maps Python classes to OWL)
         root = types.new_class(ROOT, (Thing,))
         for top, leaves in HIERARCHY.items():
             parent = types.new_class(top, (root,))
             for leaf, feats in leaves.items():
                 types.new_class(leaf, (parent,)).mapsToFeature = feats
-        # separate view, outside Person: its features keep their normal leaf
+        # Separate view outside Person, so each feature still has exactly one leaf under Person
         types.new_class(PROTECTED, (Thing,)).mapsToFeature = PROTECTED_FEATURES
     path.parent.mkdir(parents=True, exist_ok=True)
     onto.save(file=str(path))
@@ -60,7 +63,10 @@ def load(path: Path = OWL_PATH):
 
 @cache
 def _lookup(path: Path = OWL_PATH) -> tuple[dict[str, dict[int, str]], frozenset[str], dict[str, float]]:
-    """(feature -> {1: top, 2: leaf}, protected features, concept -> IC), read from the OWL file."""
+    """(feature -> {1: top, 2: leaf}, protected features, concept -> IC), read from the OWL file.
+
+    Cached: the OWL file is parsed once per path.
+    """
     onto = load(path)
     root = onto[ROOT]
     concepts = {}
@@ -71,7 +77,8 @@ def _lookup(path: Path = OWL_PATH) -> tuple[dict[str, dict[int, str]], frozenset
             (top,) = leaf.is_a  # leaves have exactly one parent
             concepts[f] = {1: top.name, 2: leaf.name}
 
-    # Intrinsic IC (Seco et al.), as in TREPAN Reloaded: 1 - log(sub-concepts + 1) / log(concepts in hierarchy)
+    # Intrinsic IC (Seco et al.), as in TREPAN Reloaded: 1 - log(sub-concepts + 1) / log(concepts in hierarchy).
+    # owlready2's descendants() includes the class itself, so len(descendants) = sub-concepts + 1.
     n = len(root.descendants())
     ic = {c.name: 1 - math.log(len(c.descendants())) / math.log(n) for c in root.descendants()}
     return concepts, frozenset(onto[PROTECTED].mapsToFeature), ic
@@ -85,8 +92,10 @@ def concept_of(feature: str, level: int, path: Path = OWL_PATH) -> str | None:
 
 
 def is_protected(feature: str, path: Path = OWL_PATH) -> bool:
+    """True if the feature belongs to the ProtectedAttribute view."""
     return feature in _lookup(path)[1]
 
 
 def information_content(concept: str, path: Path = OWL_PATH) -> float:
+    """IC of a concept under Person: 0 for the root, 1 for leaves."""
     return _lookup(path)[2][concept]

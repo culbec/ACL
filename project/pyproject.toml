@@ -1,7 +1,7 @@
 [project]
 name = "project-acl"
 version = "0.1.0"
-description = "ACL: RF+LR Onthology Project"
+description = "ACL: concept agreement of RF and bagged LR members via an ontology"
 readme = "README.md"
 authors = [
     { name = "culbec", email = "profir.alexx@gmail.com" }
@@ -19,7 +19,6 @@ dependencies = [
 ]
 
 [project.scripts]
-project-acl = "project_acl:main"
 project-acl-data = "project_acl.data:main"
 project-acl-preprocess = "project_acl.preprocess:main"
 
