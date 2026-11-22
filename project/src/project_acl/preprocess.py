@@ -15,6 +15,9 @@ from project_acl.log import get_logger
 log = get_logger(__name__)
 
 PROCESSED = DATA_DIR / "processed" / "adult.csv"
+# Not model inputs (EDA section 3-5): census sampling weight, no association with any feature or the target.
+# Kept in the processed CSV so the EDA can still show it.
+EXCLUDED = ["fnlwgt"]
 
 
 def clean(df: pd.DataFrame, dropna: bool = False) -> pd.DataFrame:
@@ -37,12 +40,17 @@ def read(path: Path = PROCESSED) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def encode(df: pd.DataFrame, target: str = TARGET) -> tuple[pd.DataFrame, pd.Series, dict[str, str]]:
-    """One-hot categoricals (`col=value`). Missing values -> all-zero dummies.
+def encode(
+    df: pd.DataFrame, target: str = TARGET, exclude: list[str] = EXCLUDED
+) -> tuple[pd.DataFrame, pd.Series, dict[str, str]]:
+    """Drop `exclude`, one-hot categoricals (`col=value`). Missing values -> all-zero dummies.
+
+    Per the EDA: rows with missing values stay (not missing at random; no imputation), and both `education`
+    and `education-num` stay (same variable, but they share one ontology concept so attribution is summed).
 
     Returns X, y and a map encoded column -> source feature.
     """
-    feats = df.drop(columns=[target, "split"])
+    feats = df.drop(columns=[target, "split", *exclude])
     cats = feats.select_dtypes(exclude="number").columns.tolist()
     X = pd.get_dummies(feats, columns=cats, prefix_sep="=", dtype=int)
     source = {c: c.split("=")[0] for c in X.columns}
