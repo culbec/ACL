@@ -1,0 +1,32 @@
+[project]
+name = "project-acl"
+version = "0.1.0"
+description = "ACL: RF+LR Onthology Project"
+readme = "README.md"
+authors = [
+    { name = "culbec", email = "profir.alexx@gmail.com" }
+]
+requires-python = ">=3.14.10"
+dependencies = [
+    "numpy>=2.5.5",
+    "owlready2>=0.51",
+    "pandas>=3.1.1",
+    "requests>=2.34.2",
+    "rich>=15.0.0",
+    "scikit-learn>=1.9.1",
+    "seaborn>=0.13.2",
+]
+
+[project.scripts]
+project-acl = "project_acl:main"
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "jupyter>=1.1.1",
+    "pytest>=9.2.0",
+]
