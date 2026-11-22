@@ -19,6 +19,8 @@ dependencies = [
 
 [project.scripts]
 project-acl = "project_acl:main"
+project-acl-data = "project_acl.data:main"
+project-acl-preprocess = "project_acl.preprocess:main"
 
 [build-system]
 requires = ["uv_build>=0.13.7,<0.14.0"]
