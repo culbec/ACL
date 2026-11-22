@@ -24,20 +24,30 @@ Source spec: [01-rr2-project.md](../spec/01-rr2-project.md).
 
 ## 3. Method
 
-### 3.1 Ontology (draft, final version comes out of EDA)
+### 3.1 Ontology (approved after P2, evidence in `01_data_eda.ipynb` section 7)
 
 ```
 Person
-├── Demographics      age, race, sex, native-country
-│   └── ProtectedAttribute   race, sex           (second parent: fairness view)
-├── Family            marital-status, relationship
-├── Education         education, education-num
-├── Employment        workclass, occupation, hours-per-week
-└── Finance           capital-gain, capital-loss
-(excluded)            fnlwgt  -> census sampling weight, not a person property
+├── Demographics
+│   ├── Age              age
+│   ├── Origin           race, native-country
+│   └── Sex              sex
+├── Family
+│   ├── MaritalStatus    marital-status
+│   └── HouseholdRole    relationship
+├── Education
+│   └── EducationLevel   education, education-num
+├── Employment
+│   ├── Sector           workclass
+│   ├── Occupation       occupation
+│   └── WorkTime         hours-per-week
+└── Finance
+    └── Capital          capital-gain, capital-loss
+ProtectedAttribute (separate view)   race, sex, relationship  (relationship leaks sex)
+(excluded)                           fnlwgt  -> census sampling weight, not a person property
 ```
 
-- EDA decides the final grouping and possible sub-concepts (for example `occupation` values grouped into WhiteCollar / BlueCollar / Service, or `education` grouped into levels).
+- Two levels only: level 1 = 5 top concepts, level 2 = 10 leaf concepts. No value-level sub-concepts.
 - Each feature is linked to its concept with an OWL annotation property (`mapsToFeature`). One-hot columns inherit the concept of their source column.
 - Features outside the ontology are dropped from the concept analysis, as in TREPAN Reloaded.
 - Information content (IC) per concept is computed from the number of sub-concepts, as in TREPAN Reloaded. It is reported, not used for training.
@@ -165,4 +175,4 @@ Each phase is one agent task. **Gate** = supervisor review before the next depen
 - **Python 3.14 wheels.** `owlready2` or `scikit-learn` may lack wheels; P0 checks this first.
 - **Similar LR members.** Bagged LR members may be near identical, so agreement is trivially high. `max_features` subsampling reduces this; if they are still near identical, that is a valid RQ3 finding.
 - **Attribution is not reasoning.** Path contributions show what a member used, not why it was trained that way. The same caveat applies as for the mapping-network justifications reviewed in RR1.
-- **Fairness.** `sex` and `race` are model inputs. The `ProtectedAttribute` view reports how much members rely on them; this is a finding to discuss, not something to remove silently.
+- **Fairness.** `sex` and `race` are model inputs, and `relationship` is a proxy for `sex`. The `ProtectedAttribute` view reports how much members rely on them; this is a finding to discuss, not something to remove silently.
